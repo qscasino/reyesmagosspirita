@@ -1,0 +1,1358 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Regalos de Reyes</title>
+
+  <style>
+    :root{
+      /* ✅ STYLE ADECUADO A REYES (dorado + cálidos) */
+      --bgA:#ffb26a;     /* dorado cálido */
+      --bgB:#ff6c3b;     /* naranja vivo */
+      --bgC:#2a0a10;     /* vino oscuro */
+      --panel: rgba(18,10,12,.58);
+      --stroke: rgba(255,255,255,.16);
+      --text:#fff;
+      --muted: rgba(255,255,255,.78);
+
+      --gold:#ffd36a;
+      --gold2:#ffb84d;
+      --mint:#2fd6a0;
+
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+      --radius: 22px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{ box-sizing:border-box }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 700px at 50% 12%, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 60%),
+        radial-gradient(900px 650px at 20% 18%, rgba(255,211,106,.20) 0%, rgba(255,211,106,0) 55%),
+        radial-gradient(900px 650px at 80% 22%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 60%),
+        radial-gradient(1200px 900px at 50% 0%, var(--bgA) 0%, var(--bgB) 40%, var(--bgC) 100%);
+    }
+
+    body::before{
+      content:"";
+      position:fixed; inset:-20%;
+      pointer-events:none;
+      background:
+        radial-gradient(150px 150px at 10% 20%, rgba(255,211,106,.26) 0%, rgba(255,211,106,0) 60%),
+        radial-gradient(190px 190px at 22% 62%, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 62%),
+        radial-gradient(160px 160px at 86% 34%, rgba(255,211,106,.22) 0%, rgba(255,211,106,0) 60%),
+        radial-gradient(240px 240px at 78% 78%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 65%);
+      filter: blur(2px);
+      opacity:.92;
+      transform: rotate(-2deg);
+    }
+
+    /* =========================================================
+       ✅ FONDO "PRO" (misma imagen en blur/cover detrás)
+       Esto hace que NO se noten los bordes del PNG al centro.
+       La imagen se setea por JS según el src de #santaBg.
+    ========================================================== */
+    #bgFull{
+      position:fixed;
+      inset:-60px;
+      z-index:0;
+      pointer-events:none;
+      background: radial-gradient(1200px 900px at 50% 0%, rgba(255,178,106,.55), rgba(0,0,0,.55));
+      filter: blur(0px);
+      transform: scale(1.02);
+    }
+    #bgFull::before{
+      content:"";
+      position:absolute; inset:0;
+      background: center/cover no-repeat;
+      filter: blur(28px) saturate(1.12) brightness(.88);
+      transform: scale(1.12);
+      opacity: 1;
+    }
+    #bgFull::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 700px at 50% 25%, rgba(255,211,106,.16) 0%, rgba(255,211,106,0) 55%),
+        radial-gradient(1200px 900px at 50% 60%, rgba(0,0,0,.18) 0%, rgba(0,0,0,.55) 70%),
+        linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.55));
+      opacity:.85;
+    }
+
+    /* ===== PRELOADER ===== */
+    #preloader{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999;
+      background:
+        radial-gradient(900px 700px at 50% 25%, rgba(255,211,106,.20) 0%, rgba(255,211,106,0) 55%),
+        radial-gradient(1200px 900px at 50% 0%, rgba(255,178,106,.95) 0%, rgba(255,108,59,.92) 35%, rgba(42,10,16,.98) 100%);
+    }
+    .pre-card{
+      width:min(560px, 92vw);
+      padding:22px 18px 18px;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(18,10,12,.62), rgba(0,0,0,.26));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(14px);
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .pre-card::after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 50% 0%, rgba(255,211,106,.22), rgba(255,211,106,0) 60%);
+      transform: rotate(8deg);
+      pointer-events:none;
+    }
+    .brand{
+      position:relative;
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+      margin-bottom:14px;
+    }
+    .brand img{
+      max-width:min(220px, 70vw);
+      max-height:66px;
+      object-fit:contain;
+      filter: drop-shadow(0 12px 22px rgba(0,0,0,.45));
+    }
+    .brand .fallback{
+      font-weight:900;
+      letter-spacing:.9px;
+      text-transform:uppercase;
+      font-size:18px;
+      opacity:.95;
+    }
+    .bar{
+      position:relative;
+      height:14px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.25);
+      overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #ffd36a, #ffb84d, #ff6c3b);
+      border-radius:999px;
+      transition: width .12s ease;
+      will-change: width;
+    }
+    .pct{
+      position:relative;
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+      letter-spacing:.2px;
+    }
+    .hint{
+      position:relative;
+      margin-top:8px;
+      font-size:12px;
+      color:rgba(255,255,255,.80);
+    }
+    .err{
+      position:relative;
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(255,255,255,.90);
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.14);
+      padding:10px 10px;
+      border-radius:14px;
+      display:none;
+      text-align:left;
+      line-height:1.25;
+    }
+    .err.show{ display:block; }
+
+    /* ===== STAGE ===== */
+    #app{
+      position:relative;
+      width:100vw;
+      height:100dvh;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: calc(10px + env(safe-area-inset-top))
+               calc(10px + env(safe-area-inset-right))
+               calc(10px + env(safe-area-inset-bottom))
+               calc(10px + env(safe-area-inset-left));
+      z-index:1;
+    }
+
+    #snowLayer{ position:absolute; inset:0; pointer-events:none; z-index:2; }
+
+    #stage{
+      position:relative;
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:1;
+    }
+
+    #santaWrap{
+      position:relative;
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
+    }
+
+    #gameLogo{
+      position:absolute;
+      top:10px;
+      left:50%;
+      transform: translateX(-50%);
+      width:min(160px, 42vw);
+      height:auto;
+      z-index:6;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    #gameLogo.hidden{ display:none; }
+
+    /* ✅ NUEVO: TÍTULO "ELEGÍ UN PREMIO" debajo del logo */
+    #gameTitle{
+      position:absolute;
+      top: calc(10px + min(160px, 42vw) * 0.62 + 8px); /* queda debajo del logo sin hardcode rígido */
+      left:50%;
+      transform: translateX(-50%);
+      z-index:6;
+      pointer-events:none;
+      user-select:none;
+      text-align:center;
+
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: linear-gradient(180deg, rgba(18,10,12,.48), rgba(0,0,0,.20));
+      backdrop-filter: blur(10px);
+
+      box-shadow:
+        0 14px 44px rgba(0,0,0,.24),
+        inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    #gameTitle.hidden{ display:none; }
+
+    #gameTitle .txt{
+      font-weight: 950;
+      letter-spacing: .9px;
+      text-transform: uppercase;
+      font-size: clamp(13px, 2.6vw, 16px);
+      line-height: 1;
+      color: #fff;
+      text-shadow: 0 10px 18px rgba(0,0,0,.35);
+    }
+    #gameTitle .txt b{
+      background: linear-gradient(90deg, #fff2c9, #ffd36a, #ffb84d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: none;
+    }
+
+    /* ✅ Imagen y WebGL en el mismo box (overlay 1:1) */
+    #santaBox{
+      position:relative;
+      display:inline-block;
+      line-height:0;
+      user-select:none;
+      -webkit-user-drag:none;
+      transform: translateZ(0);
+
+      -webkit-mask-image: radial-gradient(ellipse at center,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,1) 92%,
+        rgba(0,0,0,0) 100%);
+      mask-image: radial-gradient(ellipse at center,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,1) 92%,
+        rgba(0,0,0,0) 100%);
+      -webkit-mask-repeat:no-repeat;
+      mask-repeat:no-repeat;
+      -webkit-mask-size:100% 100%;
+      mask-size:100% 100%;
+    }
+
+    /* ✅ tu imagen (reyes.png) */
+    #santaBg{
+      display:block;
+      height: min(94dvh, 980px);
+      width:auto;
+      max-width: 98vw;
+      object-fit:contain;
+      user-select:none;
+      -webkit-user-drag:none;
+      filter: drop-shadow(0 18px 42px rgba(0,0,0,.38));
+    }
+
+    #gl{
+      position:absolute;
+      inset:0;
+      pointer-events:auto;
+      z-index:3;
+      width:100%;
+      height:100%;
+    }
+
+    #santaBox::after{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      z-index:4;
+      background: radial-gradient(ellipse at center,
+        rgba(0,0,0,0) 60%,
+        rgba(0,0,0,.18) 100%);
+      opacity:.55;
+    }
+
+    #bottomPrize{
+      position:absolute;
+      left:50%;
+      bottom:18px;
+      transform: translateX(-50%);
+      z-index:6;
+      pointer-events:auto;
+      display:none;
+    }
+
+    /* ✅ Botón base */
+    .btn{
+      pointer-events:auto;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(18,10,12,.55), rgba(0,0,0,.18));
+      color:#fff;
+      padding:11px 14px;
+      border-radius:999px;
+      font-weight:900;
+      letter-spacing:.2px;
+      cursor:pointer;
+      box-shadow: 0 14px 40px rgba(0,0,0,.25);
+      transition: transform .12s ease, border-color .12s ease, filter .12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color:rgba(255,255,255,.35); filter: brightness(1.06); }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    /* ✅ NUEVO: Botón “Ver premio” más pro (dorado, icono, glow) */
+    .btn-royal{
+      border-color: rgba(255,211,106,.42);
+      background:
+        radial-gradient(120px 80px at 22% 25%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%),
+        linear-gradient(180deg, rgba(25,10,10,.46), rgba(0,0,0,.22));
+      box-shadow:
+        0 18px 55px rgba(0,0,0,.35),
+        0 10px 26px rgba(255,211,106,.10),
+        inset 0 0 0 1px rgba(255,255,255,.06);
+      padding: 12px 16px;
+      letter-spacing: .25px;
+    }
+    .btn-royal:hover{
+      border-color: rgba(255,211,106,.72);
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+    .btn-royal:active{ transform: translateY(0px) scale(.99); }
+
+    .btn-royal .ic{
+      width:34px; height:34px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background: linear-gradient(135deg, #ffd36a, #ffb84d, #ff6c3b);
+      color:#2a0a10;
+      box-shadow: 0 10px 22px rgba(255,211,106,.18);
+      flex: 0 0 auto;
+    }
+    .btn-royal .label{
+      display:flex;
+      flex-direction:column;
+      line-height:1.05;
+      text-align:left;
+    }
+    .btn-royal .label strong{
+      font-size: 14px;
+      font-weight: 950;
+    }
+    .btn-royal .label span{
+      font-size: 11.5px;
+      color: rgba(255,255,255,.78);
+      font-weight: 700;
+      letter-spacing: .2px;
+      margin-top: 2px;
+    }
+
+    /* ===== MODAL ===== */
+    #modal{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      padding:16px;
+      z-index:9998;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+    }
+    #modal.show{ display:flex; }
+
+    .modal-card{
+      width:min(560px, 92vw);
+      border-radius:26px;
+      background:
+        radial-gradient(800px 420px at 50% -10%, rgba(255,211,106,.30), rgba(255,211,106,0) 60%),
+        linear-gradient(180deg, rgba(18,10,12,.82), rgba(0,0,0,.34));
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 28px 90px rgba(0,0,0,.55);
+      padding:16px 16px 14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .modal-card::before{
+      content:"";
+      position:absolute; inset:-40%;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,211,106,.20), rgba(255,211,106,0) 55%),
+        radial-gradient(circle at 80% 30%, rgba(255,108,59,.18), rgba(255,108,59,0) 55%);
+      transform: rotate(8deg);
+      pointer-events:none;
+    }
+
+    .modal-title{
+      position:relative;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .modal-title h2{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .badge{
+      font-size:12px;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,211,106,.18);
+      border:1px solid rgba(255,211,106,.25);
+      color:#ffe8b3;
+    }
+    .x{
+      position:relative;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+      color:#fff;
+      width:38px; height:38px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:18px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    }
+
+    .prize{
+      position:relative;
+      margin-top:6px;
+      padding:14px 14px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      background: linear-gradient(180deg, rgba(0,0,0,.26), rgba(0,0,0,.14));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .prize .big{
+      font-size:19px;
+      font-weight:950;
+      color:#fff;
+      white-space:pre-wrap;
+      text-shadow: 0 10px 18px rgba(0,0,0,.35);
+    }
+    .prize .sub{
+      margin-top:8px;
+      font-size:13px;
+      color:rgba(255,255,255,.80);
+      line-height:1.35;
+      white-space:pre-wrap;
+    }
+
+    .modal-actions{
+      position:relative;
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .btn-primary{
+      background: linear-gradient(90deg, #ffd36a, #ffb84d, #ff6c3b);
+      color:#2a0a10;
+      border-color:transparent;
+      box-shadow: 0 16px 40px rgba(255,211,106,.18);
+    }
+
+    @media (max-width: 520px){
+      #app{
+        padding: env(safe-area-inset-top) env(safe-area-inset-right)
+                 env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      #santaWrap{ padding: 0; }
+      #gameLogo{ top:8px; width:min(150px, 46vw); }
+      /* ✅ título baja un poco y se adapta */
+      #gameTitle{
+        top: calc(8px + min(150px, 46vw) * 0.62 + 8px);
+        padding: 9px 14px;
+      }
+      #santaBg{ height: 100dvh; max-width: 100vw; }
+      #bottomPrize{ bottom:14px; }
+      .btn{ padding:10px 12px; }
+      .btn-royal{ padding: 11px 14px; }
+      .btn-royal .ic{ width:32px; height:32px; border-radius:11px; }
+      .btn-royal .label strong{ font-size: 13.5px; }
+      .btn-royal .label span{ font-size: 11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .bar > div{ transition:none; }
+      .btn{ transition:none; }
+    }
+
+    .flake{
+      position:absolute;
+      top:-10px;
+      width:6px; height:6px;
+      border-radius:999px;
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 0 10px rgba(255,211,106,.18);
+      opacity:.9;
+      animation: fall linear infinite;
+    }
+    @keyframes fall{
+      to{ transform: translateY(110vh); }
+    }
+
+    .dbg-dot{
+      position:fixed;
+      width:14px; height:14px;
+      border-radius:999px;
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 0 0 3px rgba(255,150,0,.35), 0 10px 22px rgba(0,0,0,.35);
+      transform: translate(-50%, -50%);
+      z-index: 9997;
+      pointer-events:none;
+    }
+    .dbg-dot::after{
+      content: attr(data-label);
+      position:absolute;
+      left:50%; top:-18px;
+      transform: translateX(-50%);
+      font-size:12px;
+      font-weight:900;
+      color:#fff;
+      text-shadow: 0 6px 14px rgba(0,0,0,.55);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ✅ Fondo blur full-bleed (se setea por JS con el src de reyes.png) -->
+  <div id="bgFull" aria-hidden="true"></div>
+
+  <!-- PRELOADER -->
+  <div id="preloader">
+    <div class="pre-card">
+      <div class="brand">
+        <img id="brandLogo" src="assets/reyes1.png" alt="Logo"
+             onerror="this.style.display='none'; document.getElementById('brandFallback').style.display='block';">
+        <div id="brandFallback" class="fallback" style="display:none;">TU MARCA</div>
+      </div>
+
+      <div class="bar"><div id="barFill"></div></div>
+      <div class="pct" id="pct">0%</div>
+      <div class="hint" id="hint">Cargando experiencia…</div>
+      <div class="err" id="errBox"></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="app">
+    <div id="snowLayer"></div>
+
+    <div id="stage">
+      <div id="santaWrap">
+        <img id="gameLogo" src="assets/reyes1.png" alt="Logo" class="hidden"
+             onerror="this.classList.add('hidden')">
+
+        <!-- ✅ NUEVO título -->
+        <div id="gameTitle" class="hidden" aria-hidden="true">
+          <div class="txt">ELEGÍ <b>UN PREMIO</b></div>
+        </div>
+
+        <div id="santaBox">
+          <img id="santaBg" src="assets/reyes.png" alt="Reyes" draggable="false" />
+          <div id="gl"></div>
+        </div>
+
+        <div id="bottomPrize">
+          <!-- ✅ Botón más pro -->
+          <button class="btn btn-royal" id="btnSeePrize" type="button">
+            <span class="ic" aria-hidden="true">🎁</span>
+            <span class="label">
+              <strong>Ver mi premio</strong>
+              <span>Tu elección guardada</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-title">
+        <h2 id="modalTitle">¡Felicidades! <span class="badge">Premio</span></h2>
+        <button class="x" id="modalClose" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="prize">
+        <div class="big" id="prizeBig">Premio</div>
+        <div class="sub" id="prizeSub">Detalle</div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="btnOk">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    // =========================
+    // CONFIG (reutilizado)
+    // =========================
+    const STORAGE_KEY = "santaaa_gift_one_v1";
+
+    const HANDS = {
+      desktop: {
+        left:   { x: 0.35, y: 0.47 },
+        right:  { x: 0.65, y: 0.47 },
+        center: { x: 0.50, y: 0.47 }
+      },
+      mobile: {
+        left:   { x: 0.17, y: 0.24 },
+        right:  { x: 0.33, y: 0.24 },
+        center: { x: 0.25, y: 0.24 }
+      }
+    };
+
+    const SCALE = { desktop: 0.10, mobile: 0.01 };
+
+    const SCALE_CLAMP = {
+      desktop: { min: 30, max: 190 },
+      mobile:  { min: 20, max: 130 }
+    };
+
+    const PRIZES = {
+      left:   { title: "🎁 BONO 200% EN TODAS TUS CARGAS HASTA LAS 00:00", sub: "Se acredita con tus próximas cargas. Consultá condiciones con tu asesor." },
+      right:  { title: "🎁 SORPRESA REYES",                                sub: "Premio especial. Consultá condiciones con tu asesor." },
+      center: { title: "🎁 BONO 150% EN TODAS TUS CARGAS HASTA LAS 00:00", sub: "Se acredita con tus próximas cargas. Consultá condiciones con tu asesor." }
+    };
+
+    // =========================
+    // AUDIO (assets/)
+    // =========================
+    const bgAudio = new Audio("assets/bg2.mp3");
+    bgAudio.loop = true;
+    bgAudio.volume = 0.30;
+
+    const popupAudio = new Audio("assets/popup.mp3");
+    popupAudio.loop = false;
+    popupAudio.volume = 0.70;
+
+    let audioStarted = false;
+    function startAudioOnce(){
+      if(audioStarted) return;
+      audioStarted = true;
+      bgAudio.play().catch(() => { audioStarted = false; });
+    }
+    window.addEventListener("pointerdown", startAudioOnce, { passive:true });
+    window.addEventListener("keydown", startAudioOnce);
+
+    function playPopup(){
+      try{
+        popupAudio.currentTime = 0;
+        popupAudio.play().catch(()=>{});
+      } catch {}
+    }
+
+    // =========================
+    // PRELOADER
+    // =========================
+    const preloader = document.getElementById("preloader");
+    const barFill   = document.getElementById("barFill");
+    const pctEl     = document.getElementById("pct");
+    const hintEl    = document.getElementById("hint");
+    const errBox    = document.getElementById("errBox");
+    const santaImg  = document.getElementById("santaBg");
+
+    // ✅ Setea el fondo blur full-bleed con el MISMO asset
+    (function syncBgFull(){
+      const src = santaImg.getAttribute("src") || "assets/reyes.png";
+      const st = document.createElement("style");
+      st.id = "dynBgFull";
+      st.textContent = `#bgFull::before{ background-image: url("${src}"); }`;
+      document.head.appendChild(st);
+    })();
+
+    let targetPct = 0;
+    let visualPct = 0;
+    let finishedBoot = false;
+
+    function setTarget(p){ targetPct = Math.max(targetPct, Math.min(100, p)); }
+    function renderPct(){
+      visualPct += (targetPct - visualPct) * 0.12;
+      const v = Math.floor(visualPct);
+      barFill.style.width = v + "%";
+      pctEl.textContent = v + "%";
+      if(!finishedBoot) requestAnimationFrame(renderPct);
+    }
+    function showErr(msg){
+      errBox.textContent = msg;
+      errBox.classList.add("show");
+    }
+
+    function ensureImageLoaded(img, timeoutMs=6500){
+      return new Promise((resolve) => {
+        if(!img || !img.src) return resolve(false);
+        if(img.complete) return resolve(img.naturalWidth > 0);
+
+        let done = false;
+        const t = setTimeout(() => finish(false), timeoutMs);
+
+        function finish(ok){
+          if(done) return;
+          done = true;
+          clearTimeout(t);
+          img.removeEventListener("load", onLoad);
+          img.removeEventListener("error", onErr);
+          resolve(ok);
+        }
+        function onLoad(){ finish(true); }
+        function onErr(){ finish(false); }
+
+        img.addEventListener("load", onLoad, { once:true });
+        img.addEventListener("error", onErr, { once:true });
+      });
+    }
+
+    function loadScript(src, timeoutMs=8000){
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+
+        let done = false;
+        const t = setTimeout(() => {
+          if(done) return;
+          done = true;
+          s.remove();
+          reject(new Error("timeout " + src));
+        }, timeoutMs);
+
+        s.onload = () => {
+          if(done) return;
+          done = true;
+          clearTimeout(t);
+          resolve(true);
+        };
+        s.onerror = () => {
+          if(done) return;
+          done = true;
+          clearTimeout(t);
+          s.remove();
+          reject(new Error("error " + src));
+        };
+
+        document.head.appendChild(s);
+      });
+    }
+
+    async function ensureThree(){
+      if(window.THREE) return true;
+      const cdns = [
+        "https://unpkg.com/three@0.160.0/build/three.min.js",
+        "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
+      ];
+      for(const url of cdns){
+        try{
+          hintEl.textContent = "Cargando motor 3D…";
+          await loadScript(url, 8000);
+          if(window.THREE) return true;
+        } catch(e){}
+      }
+      return false;
+    }
+
+    function delay(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+    async function boot(){
+      setTarget(0);
+      requestAnimationFrame(renderPct);
+
+      const MIN_PRELOAD_MS = 1200;
+      const t0 = performance.now();
+
+      const tasks = 3;
+      let done = 0;
+      const step = (toPct) => {
+        done++;
+        const pct = Math.min(92, Math.round((done/tasks) * 92));
+        setTarget(Math.max(pct, toPct ?? pct));
+      };
+
+      hintEl.textContent = "Cargando imagen…";
+      const okSanta = await ensureImageLoaded(santaImg, 6500);
+      step(28);
+
+      hintEl.textContent = "Cargando motor 3D…";
+      const okThree = await ensureThree();
+      step(66);
+
+      hintEl.textContent = "Preparando escena…";
+      await delay(220);
+      step(92);
+
+      const warns = [];
+      if(!okSanta) warns.push("No se pudo cargar " + santaImg.getAttribute("src") + ".");
+      if(!okThree) warns.push("No se pudo cargar Three.js (revisá conexión/CSP).");
+      if(warns.length) showErr("⚠️ " + warns.join(" "));
+
+      const elapsed = performance.now() - t0;
+      if(elapsed < MIN_PRELOAD_MS) await delay(MIN_PRELOAD_MS - elapsed);
+
+      setTarget(100);
+      await delay(180);
+      finishedBoot = true;
+      barFill.style.width = "100%";
+      pctEl.textContent = "100%";
+
+      const gameLogo = document.getElementById("gameLogo");
+      gameLogo.classList.remove("hidden");
+
+      // ✅ mostrar título también
+      const gameTitle = document.getElementById("gameTitle");
+      gameTitle.classList.remove("hidden");
+      gameTitle.setAttribute("aria-hidden","false");
+
+      setTimeout(() => {
+        preloader.style.display = "none";
+        if(okThree) start();
+      }, 200);
+    }
+    boot();
+
+    // =========================
+    // Snow / sparkles
+    // =========================
+    function spawnSnow(){
+      const layer = document.getElementById("snowLayer");
+      const count = 34;
+      for(let i=0;i<count;i++){
+        const f = document.createElement("div");
+        f.className = "flake";
+        const size = 2 + Math.random()*5;
+        f.style.width = size + "px";
+        f.style.height = size + "px";
+        f.style.left = (Math.random()*100) + "vw";
+        f.style.opacity = (0.22 + Math.random()*0.55).toFixed(2);
+        const dur = 6 + Math.random()*11;
+        f.style.animationDuration = dur + "s";
+        f.style.animationDelay = (-Math.random()*dur) + "s";
+        layer.appendChild(f);
+      }
+    }
+    spawnSnow();
+
+    // =========================
+    // Modal
+    // =========================
+    const modal = document.getElementById("modal");
+    const modalClose = document.getElementById("modalClose");
+    const btnOk = document.getElementById("btnOk");
+    const prizeBig = document.getElementById("prizeBig");
+    const prizeSub = document.getElementById("prizeSub");
+    const btnSeePrize = document.getElementById("btnSeePrize");
+    const bottomPrize = document.getElementById("bottomPrize");
+
+    function openModal(title, sub){
+      prizeBig.textContent = title;
+      prizeSub.textContent = sub;
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+      playPopup();
+    }
+    function closeModal(){
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden","true");
+    }
+    modalClose.onclick = closeModal;
+    btnOk.onclick = closeModal;
+    modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
+
+    // =========================
+    // Storage (1 sola elección)
+    // =========================
+    function getStored(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      } catch { return null; }
+    }
+    function setStored(obj){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    }
+    function alreadyPlayed(){
+      return !!getStored();
+    }
+    function syncBottomButton(){
+      bottomPrize.style.display = alreadyPlayed() ? "block" : "none";
+    }
+    btnSeePrize.addEventListener("click", () => {
+      const s = getStored();
+      if(!s) return;
+      openModal(s.prize.title, s.prize.sub);
+    });
+
+    // =========================
+    // THREE
+    // =========================
+    let scene, camera, renderer, raycaster, mouse;
+    let giftLeft, giftRight, giftCenter;
+    let W=0, H=0;
+    let anims = [];
+    let busyPick = false;
+
+    const glHost = document.getElementById("gl");
+    const isDebug = new URLSearchParams(location.search).get("debug") === "1";
+    let dbgL = null, dbgR = null, dbgC = null;
+
+    function isMobile(){
+      return window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
+    }
+    function handsForViewport(){
+      return isMobile() ? HANDS.mobile : HANDS.desktop;
+    }
+    function scaleForViewport(){
+      return isMobile() ? SCALE.mobile : SCALE.desktop;
+    }
+    function clampCfg(){
+      return isMobile() ? SCALE_CLAMP.mobile : SCALE_CLAMP.desktop;
+    }
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+    let layoutPending = false;
+    function scheduleLayout(){
+      if(layoutPending) return;
+      layoutPending = true;
+      requestAnimationFrame(() => {
+        layoutPending = false;
+        onResize();
+      });
+    }
+
+    function start(){
+      initThree();
+
+      window.addEventListener("resize", scheduleLayout);
+      window.addEventListener("orientationchange", () => setTimeout(scheduleLayout, 160));
+      window.visualViewport?.addEventListener("resize", scheduleLayout);
+      window.visualViewport?.addEventListener("scroll", scheduleLayout);
+
+      try{
+        const ro = new ResizeObserver(() => scheduleLayout());
+        ro.observe(glHost);
+        ro.observe(santaImg);
+      } catch {}
+
+      setTimeout(scheduleLayout, 80);
+      setTimeout(scheduleLayout, 220);
+      setTimeout(scheduleLayout, 520);
+      setTimeout(scheduleLayout, 900);
+
+      syncBottomButton();
+      animate();
+    }
+
+    function initThree(){
+      scene = new THREE.Scene();
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+
+      renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+      renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+      renderer.setClearColor(0x000000, 0);
+      renderer.domElement.style.position = "absolute";
+      renderer.domElement.style.inset = "0";
+      renderer.domElement.style.touchAction = "manipulation";
+      glHost.appendChild(renderer.domElement);
+
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.06;
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.78));
+      scene.add(new THREE.HemisphereLight(0xfff0df, 0x2a0a10, 0.60));
+
+      const key = new THREE.DirectionalLight(0xffffff, 0.90);
+      key.position.set(320, 520, 720);
+      scene.add(key);
+
+      const warm = new THREE.PointLight(0xffd36a, 1.10, 1600);
+      warm.position.set(0, 120, 620);
+      scene.add(warm);
+
+      const rim = new THREE.PointLight(0xffffff, 0.55, 1400);
+      rim.position.set(-480, 260, 520);
+      scene.add(rim);
+
+      giftLeft   = createGift({ primary:0xff5b6a, ribbon:0xffd36a, id:"left"   });
+      giftRight  = createGift({ primary:0x2fd6a0, ribbon:0xffffff, id:"right"  });
+      giftCenter = createGift({ primary:0x7a5cff, ribbon:0xffd36a, id:"center" });
+
+      scene.add(giftLeft.group, giftRight.group, giftCenter.group);
+
+      scheduleLayout();
+
+      renderer.domElement.addEventListener("pointerdown", onPointerDown, { passive:false });
+
+      if(isDebug){
+        dbgL = document.createElement("div");
+        dbgL.className = "dbg-dot";
+        dbgL.dataset.label = "L";
+        document.body.appendChild(dbgL);
+
+        dbgR = document.createElement("div");
+        dbgR.className = "dbg-dot";
+        dbgR.dataset.label = "R";
+        document.body.appendChild(dbgR);
+
+        dbgC = document.createElement("div");
+        dbgC.className = "dbg-dot";
+        dbgC.dataset.label = "C";
+        document.body.appendChild(dbgC);
+      }
+    }
+
+    function onResize(){
+      const rect = glHost.getBoundingClientRect();
+      W = Math.max(1, Math.floor(rect.width));
+      H = Math.max(1, Math.floor(rect.height));
+
+      renderer.setSize(W, H, false);
+
+      if(!camera){
+        camera = new THREE.OrthographicCamera(-W/2, W/2, H/2, -H/2, -2000, 2000);
+        camera.position.z = 900;
+      } else {
+        camera.left = -W/2;
+        camera.right = W/2;
+        camera.top = H/2;
+        camera.bottom = -H/2;
+        camera.updateProjectionMatrix();
+      }
+
+      requestAnimationFrame(positionGiftsToHands);
+    }
+
+    function positionGiftsToHands(){
+      if(!giftLeft || !giftRight || !giftCenter) return;
+      if(W < 10 || H < 10) return;
+
+      const hands = handsForViewport();
+      const giftScale = scaleForViewport();
+      const cfg = clampCfg();
+
+      const halfW = W/2, halfH = H/2;
+      const margin = isMobile() ? 8 : 14;
+
+      const toWorld = (norm) => {
+        const lx = norm.x * W;
+        const ly = norm.y * H;
+        const wx = lx - halfW;
+        const wy = halfH - ly;
+        return { x: wx, y: wy, lx, ly };
+      };
+
+      const L = toWorld(hands.left);
+      const R = toWorld(hands.right);
+      const C = toWorld(hands.center);
+
+      let size = Math.min(W, H) * giftScale;
+
+      const hitHalfX = 1.35 / 2; // 0.675
+      const hitHalfY = 1.0  / 2; // 0.5
+
+      function maxSizeAt(x, y){
+        const maxHw = Math.min(x + halfW - margin, halfW - x - margin);
+        const maxHh = Math.min(y + halfH - margin, halfH - y - margin);
+        const maxFromX = maxHw / hitHalfX;
+        const maxFromY = maxHh / hitHalfY;
+        return Math.max(10, Math.min(maxFromX, maxFromY));
+      }
+
+      const maxL = maxSizeAt(L.x, L.y);
+      const maxR = maxSizeAt(R.x, R.y);
+      const maxC = maxSizeAt(C.x, C.y);
+
+      size = Math.min(size, maxL, maxR, maxC);
+      size = clamp(size, cfg.min, cfg.max);
+      size = Math.min(size, maxL, maxR, maxC);
+
+      const z = 320;
+
+      giftLeft.group.position.set(L.x, L.y, z);
+      giftRight.group.position.set(R.x, R.y, z);
+      giftCenter.group.position.set(C.x, C.y, z);
+
+      giftLeft.group.scale.setScalar(size);
+      giftRight.group.scale.setScalar(size);
+      giftCenter.group.scale.setScalar(size);
+
+      giftLeft.group.rotation.set(0.10, -0.30, 0.02);
+      giftRight.group.rotation.set(0.10,  0.30, -0.02);
+      giftCenter.group.rotation.set(0.12, 0.00, 0.00);
+
+      if(isDebug && dbgL && dbgR && dbgC){
+        const rect = glHost.getBoundingClientRect();
+        dbgL.style.left = (rect.left + L.lx) + "px";
+        dbgL.style.top  = (rect.top  + L.ly) + "px";
+        dbgR.style.left = (rect.left + R.lx) + "px";
+        dbgR.style.top  = (rect.top  + R.ly) + "px";
+        dbgC.style.left = (rect.left + C.lx) + "px";
+        dbgC.style.top  = (rect.top  + C.ly) + "px";
+      }
+    }
+
+    function createGift({ primary, ribbon, id }){
+      const group = new THREE.Group();
+      group.userData.id = id;
+
+      function RoundedBoxGeometry(w, h, d, r, smooth=6){
+        const shape = new THREE.Shape();
+        const hw = w/2, hh = h/2;
+        r = Math.min(r, hw, hh);
+
+        shape.moveTo(-hw + r, -hh);
+        shape.lineTo(hw - r, -hh);
+        shape.quadraticCurveTo(hw, -hh, hw, -hh + r);
+        shape.lineTo(hw, hh - r);
+        shape.quadraticCurveTo(hw, hh, hw - r, hh);
+        shape.lineTo(-hw + r, hh);
+        shape.quadraticCurveTo(-hw, hh, -hw, hh - r);
+        shape.lineTo(-hw, -hh + r);
+        shape.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
+
+        const geo = new THREE.ExtrudeGeometry(shape, {
+          depth: d,
+          bevelEnabled: true,
+          bevelSegments: smooth,
+          steps: 1,
+          bevelSize: r * 0.55,
+          bevelThickness: r * 0.55,
+          curveSegments: smooth
+        });
+
+        geo.center();
+        return geo;
+      }
+
+      const matBox = new THREE.MeshPhysicalMaterial({
+        color: primary,
+        roughness: 0.28,
+        metalness: 0.06,
+        clearcoat: 0.55,
+        clearcoatRoughness: 0.25
+      });
+
+      const matRibbon = new THREE.MeshPhysicalMaterial({
+        color: ribbon,
+        roughness: 0.22,
+        metalness: 0.18,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.28
+      });
+
+      const matEdge = new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.08,
+        roughness: 1,
+        metalness: 0
+      });
+
+      const baseGeo = RoundedBoxGeometry(1.0, 0.72, 1.0, 0.08, 6);
+      const box = new THREE.Mesh(baseGeo, matBox);
+      group.add(box);
+
+      const edge = new THREE.Mesh(baseGeo.clone(), matEdge);
+      edge.scale.set(1.01, 1.01, 1.01);
+      group.add(edge);
+
+      const ribV = new THREE.Mesh(RoundedBoxGeometry(0.17, 0.76, 1.02, 0.05, 4), matRibbon);
+      ribV.position.y = 0.01;
+      ribV.position.z = 0.01;
+      group.add(ribV);
+
+      const ribH = new THREE.Mesh(RoundedBoxGeometry(1.02, 0.18, 1.02, 0.05, 4), matRibbon);
+      ribH.position.y = 0.20;
+      ribH.position.z = 0.01;
+      group.add(ribH);
+
+      const lidPivot = new THREE.Group();
+      lidPivot.position.set(0, 0.36, -0.52);
+      group.add(lidPivot);
+
+      const lid = new THREE.Mesh(RoundedBoxGeometry(1.06, 0.22, 1.06, 0.08, 6), matBox);
+      lid.position.set(0, 0.11, 0.52);
+      lidPivot.add(lid);
+
+      const knot = new THREE.Mesh(new THREE.SphereGeometry(0.085, 18, 14), matRibbon);
+      knot.position.set(0, 0.52, 0.12);
+      group.add(knot);
+
+      const loopGeo = new THREE.TorusGeometry(0.17, 0.055, 14, 28, Math.PI);
+      const bow1 = new THREE.Mesh(loopGeo, matRibbon);
+      bow1.rotation.set(Math.PI/2, 0.2, 0.15);
+      bow1.position.set(-0.17, 0.52, 0.12);
+      group.add(bow1);
+
+      const bow2 = new THREE.Mesh(loopGeo, matRibbon);
+      bow2.rotation.set(Math.PI/2, -0.2, -0.15);
+      bow2.position.set(0.17, 0.52, 0.12);
+      group.add(bow2);
+
+      const hit = new THREE.Mesh(
+        new THREE.BoxGeometry(1.35, 1.0, 1.35),
+        new THREE.MeshBasicMaterial({ transparent:true, opacity:0 })
+      );
+      hit.position.y = 0.20;
+      hit.userData.isHit = true;
+      hit.userData.parentGift = group;
+      group.add(hit);
+
+      return { group, lidPivot, busy:false };
+    }
+
+    function onPointerDown(e){
+      e.preventDefault();
+      if(busyPick) return;
+
+      const stored = getStored();
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      mouse.set(x, y);
+
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(scene.children, true);
+      if(!hits.length) return;
+
+      const hit = hits.find(h => h.object?.userData?.isHit);
+      if(!hit) return;
+
+      if(stored){
+        openModal(stored.prize.title, stored.prize.sub);
+        return;
+      }
+
+      const giftGroup = hit.object.userData.parentGift;
+      const which = giftGroup.userData.id;
+      pickGift(which);
+    }
+
+    function pickGift(which){
+      if(alreadyPlayed()) return;
+
+      const prize = PRIZES[which];
+      if(!prize) return;
+
+      busyPick = true;
+
+      const giftObj =
+        (which === "left") ? giftLeft :
+        (which === "right") ? giftRight :
+        giftCenter;
+
+      openGiftAnim(giftObj, () => {
+        try{
+          confetti({ particleCount: 120, spread: 70, origin: { y: 0.55 }, scalar: 0.9, ticks: 180 });
+        } catch {}
+
+        setStored({ which, prize });
+        syncBottomButton();
+        openModal(prize.title, prize.sub);
+
+        busyPick = false;
+      });
+    }
+
+    function openGiftAnim(giftObj, done){
+      if(giftObj.busy) return;
+      giftObj.busy = true;
+
+      const start = performance.now();
+      const dur = 820;
+
+      const fromRot = giftObj.lidPivot.rotation.x;
+      const toRot = -1.25;
+
+      anims.push((t)=>{
+        const p = Math.min(1, (t - start) / dur);
+
+        // easeOutBack suave
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        const ease = 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2);
+
+        giftObj.lidPivot.rotation.x = fromRot + (toRot - fromRot) * ease;
+
+        if(p >= 1){
+          giftObj.busy = false;
+          done && done();
+          return false;
+        }
+        return true;
+      });
+    }
+
+    function animate(t=performance.now()){
+      requestAnimationFrame(animate);
+      if(anims.length) anims = anims.filter(fn => fn(t) !== false);
+      renderer.render(scene, camera);
+    }
+  </script>
+</body>
+</html>
